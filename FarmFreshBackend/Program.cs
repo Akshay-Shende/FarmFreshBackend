@@ -1,3 +1,7 @@
+using FarmFreshBackend;
+using FarmFreshBackend.DataSet;
+using Microsoft.EntityFrameworkCore;
+
 namespace FarmFreshBackend
 {
     public class Program
@@ -8,6 +12,15 @@ namespace FarmFreshBackend
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+
+            builder.Services.AddDbContext<DataContext>(options =>
+            {
+                options.UseMySql(
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    new MySqlServerVersion(new Version(8, 0, 19)) // Replace with your MySQL version
+                );
+            });
+
 
             var app = builder.Build();
 
