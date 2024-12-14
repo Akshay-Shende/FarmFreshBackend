@@ -1,4 +1,5 @@
-﻿using Core.Models.Users;
+﻿using Core.Models.Roles;
+using Core.Models.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace FarmFreshBackend.DataSet
@@ -12,5 +13,6 @@ namespace FarmFreshBackend.DataSet
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
     }
 }
