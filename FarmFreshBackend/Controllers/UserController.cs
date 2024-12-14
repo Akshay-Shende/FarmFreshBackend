@@ -17,10 +17,17 @@ namespace FarmFreshBackend.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpGet]
-        public IActionResult Get()
+        [HttpGet("{id:long}")]
+        public IActionResult Get([FromRoute] long id)
         {
-            return Ok("get value");
+          var result =  _userRepository.GetById(id);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public IActionResult Index() {
+           var result =  _userRepository.FindAll(e => e.DeletedOn == null);
+            return Ok(result.ResultObject.ToList());
         }
 
         [HttpPost]
@@ -34,6 +41,13 @@ namespace FarmFreshBackend.Controllers
             };
             var result = _userRepository.Create(user, 1);
 
+            return Ok(result);
+        }
+
+        [HttpDelete("{id:long}")]
+        public IActionResult Delete ([FromRoute] long id)
+        {
+            var result = _userRepository.Delete(id, 1);
             return Ok(result);
         }
     }
