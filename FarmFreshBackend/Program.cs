@@ -25,6 +25,7 @@ namespace FarmFreshBackend
             });
             builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddTransient<Repository<User>>();
+            builder.Services.AddTransient<UserRepository>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

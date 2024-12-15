@@ -16,6 +16,7 @@ namespace FarmFreshBackend.Repositories
         private readonly DataContext _dbContext;
         private readonly DbSet<T>    _dbSet;
 
+       
         public Repository(DataContext dbContext)
         {
             _dbContext = dbContext;
@@ -105,38 +106,34 @@ namespace FarmFreshBackend.Repositories
         }
 
         public IResult<IQueryable<T>> FindAll(
-             Expression<Func<T, bool>> filter = null,
-             Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-             string includeProperties = null,
-             int? skip = null,
-             int? take = null,
-             bool? ignoreQueryFilters = false,
-             bool asNoTracking = false)
+            Expression<Func<T, bool>> filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+            string includeProperties = null,
+            int? skip = null,
+            int? take = null,
+            bool? ignoreQueryFilters = false,
+            bool asNoTracking = false)
         {
-            // Initialize the result object
             var result = new Result<IQueryable<T>>
             {
+                ResultObject = Enumerable.Empty<T>().AsQueryable(), // Default initialization
                 Errors = new List<IError>()
             };
 
             try
             {
-                // Start with the base query
                 IQueryable<T> query = _dbSet;
 
-                // Apply global query filter ignoring if specified
                 if (ignoreQueryFilters == true)
                 {
                     query = query.IgnoreQueryFilters();
                 }
 
-                // Apply filter if provided
                 if (filter != null)
                 {
                     query = query.Where(filter);
                 }
 
-                // Include related properties
                 if (!string.IsNullOrEmpty(includeProperties))
                 {
                     foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -145,19 +142,16 @@ namespace FarmFreshBackend.Repositories
                     }
                 }
 
-                // Disable tracking if asNoTracking is true
                 if (asNoTracking)
                 {
                     query = query.AsNoTracking();
                 }
 
-                // Apply ordering
                 if (orderBy != null)
                 {
                     query = orderBy(query);
                 }
 
-                // Apply pagination
                 if (skip.HasValue)
                 {
                     query = query.Skip(skip.Value);
@@ -168,12 +162,10 @@ namespace FarmFreshBackend.Repositories
                     query = query.Take(take.Value);
                 }
 
-                // Set the result object
                 result.ResultObject = query;
             }
             catch (Exception ex)
             {
-                // Add error details to the result in case of an exception
                 result.Errors.Add(new Error
                 {
                     ErrorType = ErrorType.Error,
@@ -184,6 +176,7 @@ namespace FarmFreshBackend.Repositories
 
             return result;
         }
+
 
 
         public IResult<T> GetById(long id)
