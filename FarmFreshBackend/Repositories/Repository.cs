@@ -13,17 +13,24 @@ namespace FarmFreshBackend.Repositories
 {
     public class Repository<T> : IRepository<T> where T : Entity
     {
-        private readonly DataContext _dbContext;
-        private readonly DbSet<T>    _dbSet;
-
+        private readonly DataContext            _dbContext;
+        private readonly DbSet<T>               _dbSet;
+        private readonly ILogger<Repository<T>> _logger;
        
+        public Repository(DataContext dbContext, ILogger<Repository<T>> logger)
+        {
+            _dbContext = dbContext;
+            _dbSet     = _dbContext.Set<T>();
+            _logger    = logger;
+          }
+
         public Repository(DataContext dbContext)
         {
             _dbContext = dbContext;
             _dbSet     = _dbContext.Set<T>();
-          }
+        }
 
-       public virtual IResult<T> Create(T entity, long? createdById = null)
+        public virtual IResult<T> Create(T entity, long? createdById = null)
         {
             var result = new Result<T>();
             try
@@ -45,6 +52,8 @@ namespace FarmFreshBackend.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError($"error while creating User: {ex.Message}");
+
                 result.AddError(ErrorType.Error,ex.GetType().ToString(),ex.Message);
               
             }
@@ -69,7 +78,7 @@ namespace FarmFreshBackend.Repositories
                     {
                         return new Result<bool>
                         {
-                            Errors = result.Errors,
+                            Errors       = result.Errors,
                             ResultObject = false
                         };
                     }
@@ -78,7 +87,7 @@ namespace FarmFreshBackend.Repositories
 
                     return new Result<bool>
                     {
-                        Errors = result.Errors,
+                        Errors       = result.Errors,
                         ResultObject = true
                     };
                 }
@@ -89,6 +98,8 @@ namespace FarmFreshBackend.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError($"error while deleting User: {ex.Message}");
+
                 return new Result<bool>
                 {
                     Errors = new List<IError>
@@ -106,13 +117,13 @@ namespace FarmFreshBackend.Repositories
         }
 
         public IResult<IQueryable<T>> FindAll(
-            Expression<Func<T, bool>> filter = null,
+            Expression<Func<T, bool>> filter                  = null,
             Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-            string includeProperties = null,
-            int? skip = null,
-            int? take = null,
-            bool? ignoreQueryFilters = false,
-            bool asNoTracking = false)
+            string includeProperties                          = null,
+            int? skip                                         = null,
+            int? take                                         = null,
+            bool? ignoreQueryFilters                          = false,
+            bool asNoTracking                                 = false)
         {
             var result = new Result<IQueryable<T>>
             {
@@ -166,6 +177,8 @@ namespace FarmFreshBackend.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError($"error while getting User: {ex.Message}");
+
                 result.Errors.Add(new Error
                 {
                     ErrorType = ErrorType.Error,
@@ -176,8 +189,6 @@ namespace FarmFreshBackend.Repositories
 
             return result;
         }
-
-
 
         public IResult<T> GetById(long id)
         {
@@ -192,6 +203,7 @@ namespace FarmFreshBackend.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError($"error while getting User: {ex.Message}");
                 findResult.AddError(ErrorType.Error, ex.GetType().ToString(), ex.Message);
             }
             return findResult;
@@ -216,6 +228,8 @@ namespace FarmFreshBackend.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError($"error while updating User: {ex.Message}");
+
                 result.AddError(ErrorType.Error, ex.GetType().ToString(), ex.Message);
             }
             return result;

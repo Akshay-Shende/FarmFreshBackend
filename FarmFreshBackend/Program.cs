@@ -1,9 +1,12 @@
+using AutoMapper;
+using Core.Helper;
 using Core.Interfaces;
 using Core.Models.Users;
 using FarmFreshBackend;
 using FarmFreshBackend.DataSet;
 using FarmFreshBackend.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace FarmFreshBackend
 {
@@ -26,6 +29,7 @@ namespace FarmFreshBackend
             builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddTransient<Repository<User>>();
             builder.Services.AddTransient<UserRepository>();
+            builder.Services.AddAutoMapper(typeof(AutoMappingProfiles).Assembly);
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -39,6 +43,9 @@ namespace FarmFreshBackend
                     Description = "A sample API for learning purposes"
                 });
             });
+
+            builder.Host.UseSerilog((context, config) =>
+            config.ReadFrom.Configuration(context.Configuration));
 
             var app = builder.Build();
 
@@ -56,8 +63,8 @@ namespace FarmFreshBackend
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+       
 
-           
             app.UseHttpsRedirection();
             app.MapControllers();
 
@@ -66,5 +73,7 @@ namespace FarmFreshBackend
 
             app.Run();
         }
+
+        
     }
 }

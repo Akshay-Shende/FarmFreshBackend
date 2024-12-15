@@ -1,4 +1,5 @@
-﻿using Core.Dtos.UserDtos;
+﻿using AutoMapper;
+using Core.Dtos.UserDtos;
 using Core.Interfaces;
 using Core.Interfaces.Repositories;
 using Core.Models.Users;
@@ -14,17 +15,20 @@ namespace FarmFreshBackend.Controllers.Users
     {
         public readonly IRepository<User> _userRepository;
         public readonly IUserRepository _userGenRepository;
-        public UserController(Repository<User> userRepository, UserRepository userGenRepository)
+        public readonly IMapper _mapper;
+        public UserController(Repository<User> userRepository, UserRepository userGenRepository, IMapper mapper)
         {
             _userRepository = userRepository;
             _userGenRepository = userGenRepository;
+            _mapper = mapper;
         }
 
         [HttpGet("{id:long}")]
         public IActionResult Get([FromRoute] long id)
         {
             var result = _userRepository.GetById(id);
-            return Ok(result);
+          var resultDto =  _mapper.Map<UserDto>(result.ResultObject);
+            return Ok(resultDto);
         }
 
         [HttpGet]
