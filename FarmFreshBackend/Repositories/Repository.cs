@@ -195,6 +195,7 @@ namespace FarmFreshBackend.Repositories
             IResult<T> findResult = new Result<T>();
             try
             {
+                _logger.LogInformation("Testing information");
                 var result = _dbSet.Find(id);
                 if (result != null && ((IDeletable)result).DeletedById == null)
                 {
